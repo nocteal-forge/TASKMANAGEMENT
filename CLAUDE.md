@@ -101,6 +101,27 @@
 
 ## 権限設定の検証状況(2026-11-17)
 
-- 確認済み: ユーザー設定の `Bash(rmdir *)` の拒否が、セッションに適用されている。
-- 未検証: `Read` による `.env` の読み取り拒否(対象ファイルが存在せず、動作を証明できていない) / 許可 4つ(git status / diff / log / show)の動作 / プロジェクト設定の確認 9つの動作。
+プロジェクト設定(.claude/settings.json)は、2026-11-17 に、Git の自動実行向けに更新した(allow 5 / ask 12 / deny 11)。以下は、実際に動かして確認できたことと、未検証のことを区別して記録する。
+
+### 実際に確認済み
+
+- ユーザー設定の `Bash(rmdir *)` の拒否が、セッションに適用されている。
+- `git add`: 確認なしで実行できる。
+- `git commit`: 確認なしで実行できる。
+- `git commit -F -` によるヒアドキュメント形式: 確認なしで実行できる。
+- `git push origin main`: 確認なしで実行できる。
+- `git push -u origin main`: 確認なしで実行できる。
+- `git status -sb` などの引数付きの読み取り操作(`git diff --cached --stat`、`git rev-list --left-right --count`、`git remote get-url origin`、`git log --oneline -3` など): 確認なしで実行できる。
+- force push は拒否される(`git push origin main --force`、`git push --force-with-lease`、`git push -f origin main` の3形式。`--dry-run` を付けて確認)。通常の push は、誤って拒否されない。
+
+### 未検証
+
+- `Read` による `.env` の読み取り拒否(対象ファイルが存在せず、動作を証明できていない)。
+- ユーザー設定の allow 4つ(git status / diff / log / show)が、設定の許可として効いているかどうか(組み込みの読み取り専用の扱いで通っている可能性があり、区別できていない)。
+- ask の12項目(`git init`、`git checkout`、`git merge`、`git branch`、`git reset`、`git stash`、`git remote` の変更系、`gh repo`)の動作。
+- deny の、force push 以外の項目(リモートブランチの削除、強制的な `git add`、`commit --amend`、`rebase`、`filter-branch` など)の実際の動作。
+- その他のコマンド形式や、例外的なケース。
+
+### 環境の制約
+
 - `/status` と `/permissions` は、この環境で使えない。
