@@ -3,3 +3,7 @@
 
 # Claude Code のこのプロジェクト用の権限設定(ローカルのみ)
 .claude/settings.json
+
+# 環境変数ファイル(秘密情報を含む可能性があるため除外。.env.example だけは共有する)
+.env*
+!.env.example
