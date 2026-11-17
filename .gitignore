@@ -1,0 +1,5 @@
+# macOS が自動で作るファイル
+.DS_Store
+
+# Claude Code のこのプロジェクト用の権限設定(ローカルのみ)
+.claude/settings.json

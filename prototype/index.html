@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>タスク管理</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!--
+    画面プロトタイプ(モック)。バックエンド・DB・認証処理には接続しない。
+    データは画面内のダミーのみ。再読み込みすると初期状態に戻る。
+    要件は docs/ を正とする。「確認用」パネル(#proto)はモック専用で、アプリの仕様ではない。
+  -->
+  <div id="app"></div>      <!-- ログイン画面 / メイン画面(アプリ本体) -->
+  <div id="layer"></div>    <!-- ダイアログ・移動先メニュー(アプリ本体) -->
+  <div id="toast"></div>    <!-- 通知メッセージ(アプリ本体) -->
+  <div id="proto"></div>    <!-- 確認用パネル(モック専用) -->
+  <script src="app.js"></script>
+</body>
+</html>
