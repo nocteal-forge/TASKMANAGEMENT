@@ -78,6 +78,38 @@ RaiseTech 講義10「【実装】DB 構築と接続」の内容を記録する�
 - 【確定】このリポジトリは公開のため、DB の接続情報(URL、ユーザー名、パスワード)を、ソースファイル(application.yml、docker-compose.yml など)に直書きしない
 - 【提案】直書きしない方法の候補として、環境変数の利用を挙げる。具体的な方式は【未決定】(.gitignore では、`.env*` を除外し、`.env.example` だけを共有する設定にしている)
 
+## 1.4 講義11の記録(2026-11-19)
+
+RaiseTech 講義11「【実装】API 実装①(Read)と Claude、GitHub の設定」の内容を記録する。**講義で紹介・使用された内容**と、**TASKMANAGEMENT での採用候補**は、別のものとして区別する。講義で使われたことは、このプロジェクトでの採用や、正式な仕様の決定を意味しない。
+
+| 内容 | 講義11での扱い | TASKMANAGEMENT での状態 |
+| --- | --- | --- |
+| Controller 層 / Service 層(Repository と合わせた3層の構成) | 作成 | 【提案】採用候補(tech-stack.md 1 章)。最終確定は、講義の終了後 |
+| `GET /api/tasks`、`GET /api/tasks/{id}`、`GET /api/tasks/status/{status}` | READ API として実装 | 講義での紹介のみ。**TASKMANAGEMENT の正式な API 仕様としては確定しない**。URL、名前、応答の形式は【未決定】(API 設計の段階で決める) |
+| curl による API の動作確認 | 実施 | 講義の記録。このプロジェクトでの確認方法は【未決定】 |
+| data.sql によるテストデータの投入 | 使用 | 講義の記録。このプロジェクトでの扱いは【未決定】(テスト用の DB が未決定のため) |
+| GitHub Issue、作業ブランチ、Pull Request(下記「GitHub 運用」) | 運用として紹介 | 下記「GitHub 運用」を参照 |
+
+講義の status と、TASKMANAGEMENT の category は、**別の概念**として扱う。
+
+| | 講義11 | TASKMANAGEMENT(既存の DB 定義) |
+| --- | --- | --- |
+| 項目名 | status | category |
+| 値 | テストデータに todo / in_progress / done が登場 | 今日・明日・今週・完了の固定の4種類 |
+| 状態 | 講義での紹介 | 【確定】(db-definition.md。**変更しない**) |
+
+- 【未決定】status と category の対応関係(対応させるのか、させないのか。API での名前をどうするか)。推測で対応づけない
+- 【未決定】category の固定値の具体的な名前(db-definition.md の【引き継ぎ】のまま)
+- 【未決定】認証した利用者のタスクだけを返す取得の方法、応答の形式(日付、メモが空のときの表現)、並び順(position 順)の扱い。講義の READ API で、これらがどう扱われたかは、確認できていない
+
+GitHub 運用
+
+- 【確定】(requirements.md の既存の方針。変更しない)GitHub の運用(Issue・ブランチ・PR)は、必須ではなく、できる範囲で活用する。アプリの完成条件には含めない
+- 講義11で紹介された運用: GitHub Issue による作業管理、Issue 番号と連動したブランチ名(`feature/#<Issue番号>-task-read-api`)、Pull Request によるレビュー、承認後に main へ Merge、main への直接 push の禁止、Merge 後のブランチ削除と main の pull
+- 【提案】2026-11-19: 案Bを採用する方向で整理する。ドキュメントの更新は、従来どおり main への直接コミットを許可する。コードの実装は、作業ブランチを利用し、Pull Request を経由する運用を原則とする
+- 【未決定】正式な運用ルールの反映(CLAUDE.md、GitHub と Claude Code の権限設定)。技術選定の完了後、実装の開始前に行う。**今回は、CLAUDE.md と権限設定を変更していない**(現在の CLAUDE.md は、main への commit・push を前提としたまま)
+- 【未決定】ブランチ名の規則、main への直接 push を GitHub 側で禁止する設定の要否
+
 ## 2. 進め方と決める順番
 
 | 順 | 項目 | 状態 |

@@ -15,6 +15,9 @@
 - 【提案】データベース: PostgreSQL(講義9)
 - 【提案】開発環境: Git / GitHub(実施済み)
 - 【提案】DB アクセス: Spring Data JPA / Hibernate(講義10で使用。採用候補)
+- 【提案】API の構成: Controller / Service / Repository の3層(講義11で、Controller と Service を作成。Repository は講義10)。採用候補で、最終確定は講義の終了後
+- 【未決定】API のエンドポイントの設計。講義11で紹介された `GET /api/tasks` などは、TASKMANAGEMENT の正式な API 仕様としては確定しない([tech-selection.md](tech-selection.md) 1.4 章)
+- 【未決定】講義の status(todo / in_progress / done)と、TASKMANAGEMENT の category(今日・明日・今週・完了)の対応関係。別の概念として扱う。DB 定義は変更しない
 - 【提案】開発環境での DB の実行: Docker / Docker Compose(講義10で、PostgreSQL を動かす用途で使用)。本番環境での Docker([tech-selection.md](tech-selection.md) 3.9 章。Spring Boot のコンテナ化の提案)とは、別の用途
 - 【未決定】PostgreSQL のバージョン(講義10では 17 が使用されたが、採用バージョンとしては確定しない。Neon の対応バージョンは未確認)
 - 【確定】公開リポジトリのため、DB の接続情報・パスワードを、ソースファイルに直書きしない(将来の実装時の注意事項)
