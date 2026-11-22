@@ -1,6 +1,9 @@
 # タスク管理アプリ 要件定義書
 
-最終更新: 2026-11-18 / 状態: **要件定義はほぼ完了(技術選定は再開済み。最終確定は講義の終了後)。コード実装は未着手**
+最終更新: 2026-11-22
+
+- 設計の状態: **要件定義はほぼ完了**(技術選定は再開済み。最終確定は講義の終了後)
+- 実装の状態(試行): backend/ に試行環境(Java 25 / Spring Boot 4.0.10 / Gradle 9.9.2 / PostgreSQL 17 / Docker Compose)を作成済み(2026-11-22 時点。ビルド、PostgreSQL の起動、テーブルと制約の作成、再起動後の維持、Spring Boot からの DB 接続は確認済み。Hibernate の `validate` の成功は、ユーザーが報告した起動ログと設定値にもとづく判断で、起動ログ全文は未確認。Repository 経由のデータの読み書き、`DEFERRABLE` の動作、起動テストは未検証。API、Controller、Service、認証、タスク登録機能は未実装)。frontend/ に初期環境(React / Vite / JavaScript / npm / CSS Modules)を作成済み(2026-11-21 時点。ビルドと開発サーバーの起動、ブラウザでの初期画面の表示は確認済み。タスク管理の機能、API 連携、認証は未実装)。画面モックは prototype/ にもある。これらは試行であり、技術の採用確定ではない
 
 ## 0. この文書の読み方
 
@@ -17,13 +20,10 @@
 | 文書 | 内容 |
 | --- | --- |
 | [requirements.md](requirements.md)(この文書) | 概要・背景・目的・非機能要件・未決定事項・用語集 |
-| [functional-list.md](functional-list.md) | 機能一覧(F-01〜F-14) |
-| [screen-list.md](screen-list.md) | 画面一覧(画面・部品・ダイアログ・状態表示) |
-| [screen-transition.md](screen-transition.md) | 画面遷移図、遷移の一覧、認証切れ時の動き |
-| [screen-requirements.md](screen-requirements.md) | 画面要件(ユースケース、画面仕様、状態、表示テーマ、PC/スマホの操作方法) |
-| [db-definition.md](db-definition.md) | DB 定義(テーブル、項目、ER 図、データ項目の入力ルール) |
-| [tech-stack.md](tech-stack.md) | 技術スタック、システム構成、公開方針、認証・アクセス制御 |
-| [tech-selection.md](tech-selection.md) | 技術選定の経緯・比較・保留(2026-11-18 に再開。講義9を基準に検討中) |
+| [functional-requirements.md](functional-requirements.md) | 機能一覧(F-01〜F-14) |
+| [screen-design.md](screen-design.md) | 画面設計(1 画面一覧、2 画面遷移、3 ユースケース・操作フロー、4 画面仕様、5 状態、6 表示テーマ、7 操作方法(PC / スマホ)、8 画面設計の完了) |
+| [database-design.md](database-design.md) | DB 設計(テーブル、項目、ER 図、データ項目の入力ルール、実装との対応) |
+| [tech-stack.md](tech-stack.md) | 技術スタック、システム構成、公開方針、認証・アクセス制御(1〜4 章)。技術選定の経緯・比較・保留理由・講義の記録(5〜9 章。2026-11-18 に再開。講義9を基準に検討中) |
 
 
 ## 1. 確定事項(概要)
@@ -66,18 +66,31 @@
 
 | 旧 章 | 内容 | 移動先 |
 | --- | --- | --- |
-| 3 | 機能要件 | [functional-list.md](functional-list.md) |
+| 3 | 機能要件 | [functional-requirements.md](functional-requirements.md) |
 | 4.1.1 | システム構成 | [tech-stack.md](tech-stack.md) 2 章 |
-| 4.1.2 | データの項目と入力ルール | [db-definition.md](db-definition.md) 6 章 |
+| 4.1.2 | データの項目と入力ルール | [database-design.md](database-design.md) 6 章 |
 | 4.2 | 公開方針・競合 | [tech-stack.md](tech-stack.md) 3 章 |
-| 4.3 | 表示テーマ | [screen-requirements.md](screen-requirements.md) 6 章 |
+| 4.3 | 表示テーマ | [screen-design.md](screen-design.md) 6 章 |
 | 4.4 | 認証・アクセス制御 | [tech-stack.md](tech-stack.md) 4 章 |
-| 4.5 | 操作方法(PC / スマホ) | [screen-requirements.md](screen-requirements.md) 7 章 |
+| 4.5 | 操作方法(PC / スマホ) | [screen-design.md](screen-design.md) 7 章 |
 | 6 | 技術スタック | [tech-stack.md](tech-stack.md) 1 章 |
-| 旧 画面設計書 1 章 | 画面一覧 | [screen-list.md](screen-list.md) |
-| 旧 画面設計書 2 章 | 画面遷移 | [screen-transition.md](screen-transition.md) |
-| 旧 画面設計書 3〜5 章 | ユースケース・画面仕様・状態 | [screen-requirements.md](screen-requirements.md) 3〜5 章 |
-| 旧 data-design.md | データ設計 | [db-definition.md](db-definition.md) |
+| 旧 画面設計書 1 章 | 画面一覧 | [screen-design.md](screen-design.md) 1 章 |
+| 旧 画面設計書 2 章 | 画面遷移 | [screen-design.md](screen-design.md) 2 章 |
+| 旧 画面設計書 3〜5 章 | ユースケース・画面仕様・状態 | [screen-design.md](screen-design.md) 3〜5 章 |
+| 旧 data-design.md | データ設計 | [database-design.md](database-design.md) |
+
+2026-11-21 に、docs を 8 ファイルから 5 ファイルに再編成した。**上の表の移動先は、再編成後の場所**を示す。再編成前のファイルとの対応は次のとおり(内容は移しただけで、仕様は変えていない)。
+
+| 再編成前 | 再編成後 |
+| --- | --- |
+| `functional-list.md` | [functional-requirements.md](functional-requirements.md) |
+| `screen-list.md` | [screen-design.md](screen-design.md) 1 章 |
+| `screen-transition.md` | [screen-design.md](screen-design.md) 2 章 |
+| `screen-requirements.md` | [screen-design.md](screen-design.md) 3〜8 章(章番号は変わらない) |
+| `db-definition.md` | [database-design.md](database-design.md)(章番号は変わらない。7 章「実装との対応」を追加) |
+| `tech-stack.md` | [tech-stack.md](tech-stack.md) 1〜4 章(章番号は変わらない) |
+| `tech-selection.md` | [tech-stack.md](tech-stack.md) 5〜9 章(旧章番号の最初の数字に 4 を足す。旧 1.2 章 → 5.2 章、旧 3.9 章 → 7.9 章) |
+| `requirements.md` | [requirements.md](requirements.md)(章番号は変わらない) |
 
 この文書に残る章番号(5〜9)は、他の文書からの参照を保つため、変更していない。
 
@@ -109,13 +122,13 @@
 
 ### 保存・通信エラー時の表示
 
-詳細は [screen-requirements.md](screen-requirements.md) 5 章で確定済み。要約は次のとおり。
+詳細は [screen-design.md](screen-design.md) 5 章で確定済み。要約は次のとおり。
 
 - 【確定】追加・移動・並び替えの保存に失敗したときは、画面を変更前の状態に戻し、画面下に赤系のエラー通知(「保存できませんでした。変更を元に戻しました。もう一度お試しください。」)を、ユーザーが閉じるまで表示する。再試行ボタンは設けず、同じ操作をやり直す
 - 【確定】編集ダイアログの保存・削除は、ボタンを無効化して二重送信を防ぎ、「保存中…」「削除中…」と表示する。成功したらダイアログを閉じる。失敗したら、ダイアログを開いたまま入力内容を保持し、ダイアログ内に赤字でエラー(保存:「保存できませんでした。もう一度お試しください。」/ 削除:「削除できませんでした。もう一度お試しください。」)を表示する。再度ボタンを押せば、再試行できる
 - 【確定】画面を開いたときは、ヘッダーと 4 つの分類の見出しを表示し、件数は「-」、各分類には薄いグレーの「読み込み中…」を表示する。読み込みに失敗したときは、ヘッダー直下に「タスクを読み込めませんでした。」と「再読み込み」ボタンを表示し、成功するまで追加・編集の部品は表示しない
-- 【確定】ログインの通信エラー、ログアウトの失敗時の表示も、[screen-requirements.md](screen-requirements.md) 5.5 のとおり
-- 【確定】他の端末との食い違い(競合)を検知したときの扱いは、[tech-stack.md](tech-stack.md) 3 章と [screen-requirements.md](screen-requirements.md) 5.7 のとおり
+- 【確定】ログインの通信エラー、ログアウトの失敗時の表示も、[screen-design.md](screen-design.md) 5.5 のとおり
+- 【確定】他の端末との食い違い(競合)を検知したときの扱いは、[tech-stack.md](tech-stack.md) 3 章と [screen-design.md](screen-design.md) 5.7 のとおり
 
 ### セキュリティ(基本対策)
 
@@ -138,7 +151,7 @@
 ### サーバーの稼働
 
 - 【確定】サーバーの稼働率について、数値目標は設けず、無料サービスの範囲で運用する
-- 【確定】サーバー停止時は、読み込み失敗の表示([screen-requirements.md](screen-requirements.md) 5.5)を表示する
+- 【確定】サーバー停止時は、読み込み失敗の表示([screen-design.md](screen-design.md) 5.5)を表示する
 - 【確定】無料サービスの休止から起動するまでの待ち時間は、許容する
 - 【確定】稼働率の目標は、アプリの完成条件には含めない
 

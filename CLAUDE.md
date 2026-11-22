@@ -7,13 +7,12 @@
 | ファイル | 役割 |
 | --- | --- |
 | requirements.md | 概要・背景・目的・非機能要件・未決定事項・用語集 |
-| functional-list.md | 機能一覧 |
-| screen-list.md | 画面一覧 |
-| screen-transition.md | 画面遷移図 |
-| screen-requirements.md | 画面要件(ユースケース、画面仕様、状態、操作方法) |
-| db-definition.md | DB 定義(テーブル、項目、ER 図) |
-| tech-stack.md | 技術スタック、システム構成、公開方針、認証 |
-| tech-selection.md | 技術選定の経緯と比較(2026-11-18 に再開。講義9を基準に検討中) |
+| functional-requirements.md | 機能一覧 |
+| screen-design.md | 画面設計(画面一覧、画面遷移、ユースケース、画面仕様、状態、操作方法) |
+| database-design.md | DB 設計(テーブル、項目、ER 図、schema.sql・Entity との対応) |
+| tech-stack.md | 技術スタック、システム構成、公開方針、認証(1〜4 章)。技術選定の経緯と比較(5〜9 章。2026-11-18 に再開。講義9を基準に検討中) |
+
+2026-11-21 に、docs を 8 ファイルから 5 ファイルに再編成した(旧ファイルとの対応は、requirements.md 3 章)。
 
 ラベル: 【確定】=承認済み / 【提案】=承認待ち / 【未決定】=要検討。
 
@@ -23,7 +22,7 @@
 - 【確定】の内容を、承認なしに変更しない。未指定の機能や技術を、決定済みとして扱わない。
 - 設定やファイルを変更する前に、変更内容と影響範囲を示し、承認を得てから行う。
 - 技術選定は、2026-11-18 に再開した(講義9を基準)。React、JavaScript、Vite、dnd-kit、CSS Modules、Java、Spring Boot、Gradle、REST API、PostgreSQL は、採用候補(【提案】)。講義が続いているため、最終確定は、講義の終了後に、ユーザーの承認を得て行う。TypeScript と Next.js は採用対象外、パッケージ管理は npm(【確定】)。
-- コードの作成は、技術選定が完了するまで行わない。例外: prototype/ 内の HTML / CSS / JavaScript の画面プロトタイプ。バックエンド・DB との接続や、完成版アプリの実装は行わない。
+- コードの作成は、技術選定の最終確定(講義の終了後)までは、次の例外に限る。(1) prototype/ 内の HTML / CSS / JavaScript の画面プロトタイプ。(2) 2026-11-20 にユーザーが承認した、講義10〜12 に沿った**試行実装**(backend/、frontend/、docker-compose.yml)。試行実装は、DB → バックエンド → API → フロントエンド → 連携・動作確認の順に、段階ごとの承認を得て進める。試行に使う技術は【提案】のままで、採用確定ではない。
 
 ## コマンドの実行
 
@@ -98,6 +97,16 @@
 ### 権限設定との関係
 
 - CLAUDE.md の記述は、Claude Code の権限設定を変えない。プロジェクト設定(.claude/settings.json)で、git add / commit / push などは「確認」になっているため、自動実行の途中でも、確認が出る。
+
+## 試行実装の進捗(2026-11-22 時点)
+
+詳細は、docs/database-design.md 7 章と、各 docs 冒頭の「実装の状態(試行)」を参照。以下は、記録の要約。
+
+- 完了(確認済み): frontend/ の初期環境(2026-11-21)。Phase A(`.env`、`.env.example` の用意。`.env` は Git 管理対象外)。Phase B(PostgreSQL 17 の起動、healthy、テーブル 2・制約 6 の確認、ボリュームを残した再起動後の維持と schema.sql の再実行なし)。Phase C(Spring Boot の起動、PostgreSQL への接続、8080 番の待ち受け)
+- ユーザーの報告にもとづく判断: Hibernate の `validate` の成功(ユーザーが報告した起動ログと設定値にもとづく。起動ログ全文は、未確認)
+- 未検証: `DEFERRABLE` の動作、Repository 経由のデータの読み書き、コンテナを作り直した場合のデータの維持。`TaskmanagementApplicationTests` は保留
+- 未実装: API、Controller、Service、認証、タスク登録機能
+- 起動時の注意: Spring Boot は `.env` を自動では読まない。ユーザーが、起動する端末で `.env` を読み込んでから `./gradlew bootRun` を実行する(`.env` の中身と環境変数は表示しない)。Docker は PATH にないため、Claude Code からは、フルパス(`/Applications/Docker.app/Contents/Resources/bin/docker`)で実行する。`docker compose up` でイメージを取得するときは、ユーザーの端末で、その端末だけ PATH に Docker のフォルダを追加して実行する
 
 ## 権限設定の検証状況(2026-11-17)
 
