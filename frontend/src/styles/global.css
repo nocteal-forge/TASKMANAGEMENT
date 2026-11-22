@@ -1,0 +1,11 @@
+/* 全体に共通の最小限の設定 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+  color: #222;
+  background: #fff;
+}
