@@ -1,0 +1,30 @@
+# 開発用の PostgreSQL(試行)。本番用の設定ではない。
+# 接続情報は、同じフォルダの .env(Git に入らない)から読む。雛形は .env.example。
+name: taskmanagement
+
+services:
+  db:
+    image: postgres:17
+    container_name: taskmanagement-db
+    environment:
+      # 未設定のときは、エラーで止まる(既定のパスワードは、置かない)
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB が未設定です。.env を確認してください}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER が未設定です。.env を確認してください}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD が未設定です。.env を確認してください}
+    ports:
+      # 自分の Mac からだけ接続できるようにする(他の機器からは接続できない)
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # データは、名前付きボリュームに保存する(コンテナを消しても残る)
+      - db_data:/var/lib/postgresql/data
+      # テーブル定義は、ボリュームが空の「初回の初期化時」だけ実行される。読み取り専用でマウントする。
+      # ボリュームが残っている場合は、再実行されない。
+      - ./backend/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db_data:

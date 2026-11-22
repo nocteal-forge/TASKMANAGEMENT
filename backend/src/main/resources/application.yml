@@ -1,0 +1,18 @@
+# 接続情報は、環境変数から読む(このファイルには、値を直書きしない)。
+# 環境変数の名前は、docker-compose.yml(ルート)と共通。
+# 値は、.env(Git に入らない)に書く。雛形は .env.example。
+spring:
+  application:
+    name: taskmanagement
+  datasource:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  jpa:
+    hibernate:
+      # テーブルは作らない。Entity と実際のテーブルが一致するかだけを検査する。
+      ddl-auto: validate
+  sql:
+    init:
+      # テーブルは Spring Boot では作らない(PostgreSQL コンテナの初回初期化で schema.sql を実行する)
+      mode: never
