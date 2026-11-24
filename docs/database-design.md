@@ -1,6 +1,6 @@
 # DB 設計(データ設計・ER 図)
 
-最終更新: 2026-11-22
+最終更新: 2026-11-24
 
 - 設計の状態: **完了(承認済み)**
 - 実装の状態(試行): backend/ に試行環境(Java 25 / Spring Boot 4.0.10 / Gradle 9.9.2 / PostgreSQL 17 / Docker Compose)を作成済み(2026-11-22 時点。ビルド、PostgreSQL の起動、テーブルと制約の作成、再起動後の維持、Spring Boot からの DB 接続は確認済み。Hibernate の `validate` の成功は、ユーザーが報告した起動ログと設定値にもとづく判断で、起動ログ全文は未確認。Repository 経由のデータの読み書き、`DEFERRABLE` の動作、起動テストは未検証。API、Controller、Service、認証、タスク登録機能は未実装)。frontend/ に初期環境(React / Vite / JavaScript / npm / CSS Modules)を作成済み(2026-11-21 時点。ビルドと開発サーバーの起動、ブラウザでの初期画面の表示は確認済み。タスク管理の機能、API 連携、認証は未実装)。画面モックは prototype/ にもある。これらは試行であり、技術の採用確定ではない
@@ -160,6 +160,10 @@ erDiagram
 | created_at・updated_at の型 | `timestamptz`(`NOT NULL`、既定値 `now()`)。Entity では、登録・更新の対象にせず、DB の既定値に任せる | 【提案】(試行) | 型名は「仮の表記」(4 章の補足)。updated_at の更新方法(競合検知で使う。[tech-stack.md](tech-stack.md) 3 章)は、API 設計の段階で決める |
 | 複合ユニーク制約の検査のタイミング | `DEFERRABLE INITIALLY IMMEDIATE`(検査は 1 つの文の終わり。必要なときは、トランザクション内で検査をコミット時まで遅らせられる) | 【提案】(試行) | 並び替えの一時的な番号重複への対処(5 章【引き継ぎ】)の候補。遅延可能にするかの最終判断は【未決定】(API 設計の段階)。動作の検証は、まだ行っていない |
 | id の自動採番の方法 | `GENERATED ALWAYS AS IDENTITY` | 【提案】(試行) | 「連番(自動採番)」の実現方法 |
+| category の内部値(試行) | schema.sql は変更しない(`varchar(20)` のまま)。アプリ側の `TaskCategory`(列挙型)で、`today` / `tomorrow` / `this_week` / `completed` の 4 種類だけを受け付ける。表示順は、アプリ側で管理する | 【提案】(試行実装方針・承認済み) | 値の名前は、試行用(2026-11-24 に承認)。上の「category の型・長さ」「category の値の限定」の未決定の行は、変えない。DB の CHECK 制約の追加は、今回の範囲外。詳細は [tech-stack.md](tech-stack.md) 10.4 章 |
+| 競合検知の方針 | schema.sql は変更しない。条件付き UPDATE(`WHERE id = ? AND user_id = ? AND updated_at = ?`)で、確認と更新を 1 つの SQL 文で行う。`@Version` には置き換えない | 【提案】(試行実装方針・承認済み) | 確定仕様(競合の検知に `updated_at` を使う。[tech-stack.md](tech-stack.md) 3 章)を実現する方法。複数行を更新する、分類移動・並び替えの競合検知は、Phase 3 で設計する。詳細は tech-stack.md 10.7 章 |
+| updated_at の時刻の生成方法 | 未定(現在は、DB の既定値 `now()` だけで、更新時の生成は、未実装) | 【未決定】 | `now()` はトランザクションの開始時刻を返す。更新後の値が、更新前の値より、確実に新しくなる方法を、時刻の精度・同一時刻での更新・時計の逆行も含めて検討する。Phase 2 の開始前に提案する |
+| 暫定ユーザー(開発環境のみ) | users テーブルの定義は変更しない。開発用の暫定ユーザーの行を、`dev` プロファイルでのみ、起動時に存在を確認して作成する方式が、採用候補。`password_hash` は、正式なログインに使えない値にする | 【提案】(試行実装方針・承認済み) | **作成は、Phase 1 の開始時に、別途承認を得る(まだ作成していない)**。認証の実装時に撤去する。詳細は tech-stack.md 10.5 章 |
 
 ### 7.4 テーブルの作り方(試行)
 
