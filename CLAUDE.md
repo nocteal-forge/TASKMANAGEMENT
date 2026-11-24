@@ -23,6 +23,7 @@
 - 設定やファイルを変更する前に、変更内容と影響範囲を示し、承認を得てから行う。
 - 技術選定は、2026-11-18 に再開した(講義9を基準)。React、JavaScript、Vite、dnd-kit、CSS Modules、Java、Spring Boot、Gradle、REST API、PostgreSQL は、採用候補(【提案】)。講義が続いているため、最終確定は、講義の終了後に、ユーザーの承認を得て行う。TypeScript と Next.js は採用対象外、パッケージ管理は npm(【確定】)。
 - コードの作成は、技術選定の最終確定(講義の終了後)までは、次の例外に限る。(1) prototype/ 内の HTML / CSS / JavaScript の画面プロトタイプ。(2) 2026-11-20 にユーザーが承認した、講義10〜12 に沿った**試行実装**(backend/、frontend/、docker-compose.yml)。試行実装は、DB → バックエンド → API → フロントエンド → 連携・動作確認の順に、段階ごとの承認を得て進める。試行に使う技術は【提案】のままで、採用確定ではない。
+- 実装の Phase(開発ロードマップ。docs/tech-stack.md 10.2 章)の開始前に、具体的な作業内容、変更対象、完了条件、テスト方法を提示し、承認を得る。各 Phase は、バックエンドの動作確認を先に行い、その後に、対応する画面を実装する。
 
 ## コマンドの実行
 
@@ -39,8 +40,12 @@
 - 状態確認・差分確認などの読み取りは、設定の範囲内で実行してよい。
 - 自動実行(次節)に該当しない Git 操作(ブランチ操作など)は、実行前に、必要な操作を説明し、依頼内容を確認してから実行する。
 - 自動実行の範囲では、「コマンドの実行」節の「実行前の説明」と、上記の「実行前の確認」を省き、最後の報告で、何をしたかを説明する(この節の定めを優先する)。
-- `git init` は実行済み(ローカルの Git リポジトリ)。ブランチは main。
-- 想定する送り先: origin = https://github.com/nocteal-forge/TASKMANAGEMENT.git、ブランチ = main(公開リポジトリ)。
+- `git init` は実行済み(ローカルの Git リポジトリ)。`main` は安定版。
+- 送り先: origin = https://github.com/nocteal-forge/TASKMANAGEMENT.git(公開リポジトリ)。
+- 開発は、機能単位の作業ブランチと PR(Pull Request。「この変更を main に取り込んでください」という、GitHub 上の依頼とレビューの場)で行う(2026-11-24 に承認)。ブランチ名は、`docs/`(文書関連)、`feature/`(機能実装)で始める。`main` への直接の commit・push は、原則として行わない。
+- 作業ブランチの push は、`-u` を使わず、リモート名とブランチ名を明示する(例: `git push origin docs/phase0-design`)。
+- ブランチの作成・切り替え・削除、`pull`、PR の作成・マージは、自動実行に含めず、そのつど、ユーザーの承認を得る。PR には、変更概要・テスト結果・未検証事項を記載する。関係のない変更を、同じ PR に含めない。マージ方式は、最初の PR の作成時に、選択肢を提示する。
+- 権限による拒否が発生したときは、停止して、原因を報告する(権限設定は、変更しない。回避しない)。
 
 ### 自動実行(音声入力向け)
 
@@ -48,9 +53,11 @@
 
 | 指示の例 | 実行する範囲 |
 | --- | --- |
-| 「コミットして」 | commit まで(push しない) |
-| 「コミットプッシュして」「commitしてpushして」「変更をGitHubに上げて」「GitHubに反映して」 | commit と push |
-| 「pushして」 | 既存のコミットの push のみ。未コミットの変更がある場合は、自動で commit せず、確認する |
+| 「コミットして」 | 現在の作業ブランチへの commit まで(push しない) |
+| 「コミットプッシュして」「commitしてpushして」「変更をGitHubに上げて」「GitHubに反映して」 | 現在の作業ブランチへの commit と、`git push origin <ブランチ名>` |
+| 「pushして」 | 現在の作業ブランチの、既存のコミットの push のみ。未コミットの変更がある場合は、自動で commit せず、確認する |
+
+現在のブランチが `main` の場合は、自動実行せず、確認する(作業ブランチを作成してから行う)。
 
 #### 手順(commit する場合)
 
@@ -59,10 +66,10 @@
 3. git diff --cached でステージング済みの変更を確認
 4. 機密情報・認証情報・.env・秘密鍵などが含まれていないか確認(ファイル名と差分の内容で判断する。「パスワード」という語が、ドキュメントの説明として出てくるだけの場合は、問題としない)
 5. 不要なファイルや、意図しない変更がないか確認
-6. 問題がなければ、必要なファイルを指定して git add(.gitignore で除外されたファイルは登録しない)
+6. 問題がなければ、必要なファイルを個別に指定して git add(.gitignore で除外されたファイルは登録しない。`--` は付けない。権限設定の deny が、広く一致するため。下記「権限設定の検証状況」の 2026-11-24 の追記を参照)
 7. 変更内容に合ったコミットメッセージを、日本語で作成(1行目に要約、必要なら箇条書き)
 8. git commit を実行
-9. 「コミットして」の場合は、ここで終了し、10・11 へ。それ以外は、git push を実行(送り先が、上記の想定と一致していることを確認してから)
+9. 「コミットして」の場合は、ここで終了し、10・11 へ。それ以外は、`git push origin <現在の作業ブランチ名>` を実行(リモート名とブランチ名が、承認済みの内容と一致していることを確認してから。`-u` は使わない)
 10. git status と git log で完了状態を確認
 11. 結果を日本語で報告(コミットの ID、含まれたファイル、push 先、作業ツリーの状態)
 
@@ -70,7 +77,7 @@
 
 1. git status で、未コミットの変更がないことを確認(ある場合は、commit せず、確認する)
 2. push されていないコミットの内容(git log と差分)を確認し、手順 4・5 と同じ観点で、機密情報や意図しない内容がないか確認
-3. 送り先が、想定と一致していることを確認し、git push を実行
+3. リモート名とブランチ名が、承認済みの内容と一致していることを確認し、`git push origin <現在の作業ブランチ名>` を実行(`-u` は使わない)
 4. git status と git log で完了状態を確認し、結果を日本語で報告
 
 ### 自動実行を中断して確認する条件
@@ -83,6 +90,8 @@
 - commit や push が失敗した(オプションを変えた再試行は、しない)
 - どのファイルを登録すべきか判断できない
 - push 先が、想定している GitHub リポジトリと異なる
+- 現在のブランチが `main` である(作業ブランチではない)
+- push 先のブランチが、承認済みの作業ブランチと異なる
 - force push が必要になる状況
 
 ### 禁止事項
@@ -90,17 +99,23 @@
 - git push --force、git push -f(--force-with-lease を含む)
 - git reset --hard、git clean
 - 履歴を書き換える操作(commit --amend、rebase、reset など)
+- `main` への直接の commit・push(原則。ユーザーが、明示的に、例外として承認した場合を除く)
 - ユーザーの許可がない、GitHub リポジトリの新規作成・削除
 - リモート URL の無断変更(git remote add / set-url / remove など)
 - 認証情報の表示や記録
 
 ### 権限設定との関係
 
-- CLAUDE.md の記述は、Claude Code の権限設定を変えない。プロジェクト設定(.claude/settings.json)で、git add / commit / push などは「確認」になっているため、自動実行の途中でも、確認が出る。
+- CLAUDE.md の記述は、Claude Code の権限設定を変えない。
+- 実際の設定(2026-11-24 に、設定ファイルを読んで確認): プロジェクト設定(.claude/settings.json)では、`git add`、`git commit`、`git push origin main`、`git push -u origin main`、`git fetch origin` は allow(確認なし)。`git init`、`git checkout`、`git merge`、`git branch`、`git reset`、`git stash`、`git remote` の変更系、`gh repo` は ask(確認)。deny は、force push 系、強制的な `git add`、`commit --amend`、`rebase`、`filter-branch` など。ユーザー設定(~/.claude/settings.json)の deny には、`rm`、`sudo`、`git reset --hard`、`git clean`、`.env` の Read などがある。
+- 設定に許可ルールが無い Git 操作(`git switch`、`git pull`、`git push origin <作業ブランチ>`、`gh pr` など)は、既定の動作で、確認が出る設定である(実際の画面の挙動は、操作ごとには、未確認)。
+- 以前の記述(git add / commit / push などは「確認」になっている)は、実際の設定(allow)と食い違っていたため、2026-11-24 に修正した。
 
-## 試行実装の進捗(2026-11-22 時点)
+## 試行実装の進捗(2026-11-24 時点)
 
 詳細は、docs/database-design.md 7 章と、各 docs 冒頭の「実装の状態(試行)」を参照。以下は、記録の要約。
+
+- 2026-11-24 に、試行実装の設計方針(Phase 0)を承認した(API 設計、category の内部値、暫定ユーザー、入力検証、競合検知、開発ロードマップ Phase 0〜3、Git 運用)。**試行の設計方針であり、正式仕様の確定でも、機能実装の開始の承認でもない。** 詳細は、docs/tech-stack.md 10 章。docs への記録は、作業ブランチ `docs/phase0-design` の PR で行う。完了列への新規登録を許可する仕様も、同日に決定した(docs/screen-design.md 7 章、docs/functional-requirements.md F-04)
 
 - 完了(確認済み): frontend/ の初期環境(2026-11-21)。Phase A(`.env`、`.env.example` の用意。`.env` は Git 管理対象外)。Phase B(PostgreSQL 17 の起動、healthy、テーブル 2・制約 6 の確認、ボリュームを残した再起動後の維持と schema.sql の再実行なし)。Phase C(Spring Boot の起動、PostgreSQL への接続、8080 番の待ち受け)
 - ユーザーの報告にもとづく判断: Hibernate の `validate` の成功(ユーザーが報告した起動ログと設定値にもとづく。起動ログ全文は、未確認)
@@ -130,6 +145,15 @@
 - ask の12項目(`git init`、`git checkout`、`git merge`、`git branch`、`git reset`、`git stash`、`git remote` の変更系、`gh repo`)の動作。
 - deny の、force push 以外の項目(リモートブランチの削除、強制的な `git add`、`commit --amend`、`rebase`、`filter-branch` など)の実際の動作。
 - その他のコマンド形式や、例外的なケース。
+
+### 2026-11-24 の追記(Git 運用の変更に伴い判明したこと)
+
+実際に確認できたことと、推定を区別して記録する。
+
+- 実際に確認済み(2026-11-23): `git add -- <ファイル名…>`(`--` あり。ファイル名に `functional` などの `f` を含む)は、拒否された。拒否の理由の表示は、確認できていない。同じファイルを `--` なしで指定した `git add` は、実行できた。
+- 実際に確認済み(2026-11-24): `git switch -c docs/phase0-design` は、実行できた(確認画面の有無は、記録していない)。
+- 推定(パターン照合の計算による。実行での確認は、していない): deny の `git add -*f*` と `git push -*f*` は、`*` が任意の文字列に一致するため、強制オプション(`-f`)ではないコマンドにも、一致する。`git push -u origin feature/…` は、ブランチ名の `f` で、拒否される。`git push origin feature/…`(`-u` なし)は、拒否されない。
+- 運用上の対処: `git add` は、`--` を付けず、ファイル名を個別に指定する。`git push` は、`-u` を付けず、リモート名とブランチ名を明示する。設定は、変更していない。deny が、本来の意図(強制 add・強制 push を止める)より広く一致する点は、設定の見直しの余地として、ユーザーが判断する。
 
 ### 環境の制約
 
